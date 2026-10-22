@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calculadora de Incentivos - Crédito Auto Coppel</title>
+    <!-- Tailwind CSS CDN para diseño responsivo móvil -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .coppel-blue { background-color: #005CB9; }
+        .coppel-blue-dark { background-color: #00458C; }
+        .text-coppel-blue { color: #005CB9; }
+        .border-coppel-blue { border-color: #005CB9; }
+        .coppel-yellow { background-color: #FEDB00; }
+        .text-coppel-yellow { color: #C9A700; }
+        .border-coppel-yellow { border-color: #FEDB00; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased pb-12">
+
+    <!-- Header Institucional -->
+    <header class="coppel-blue text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="coppel-yellow text-blue-900 font-black px-2.5 py-1 rounded-md text-sm tracking-wider">
+                    COPPEL
+                </div>
+                <div>
+                    <h1 class="text-base font-bold leading-tight">Calculadora Crédito Auto</h1>
+                    <p class="text-xs text-blue-200">Esquema Oficial de Incentivos</p>
+                </div>
+            </div>
+            <span class="text-xs font-semibold bg-blue-800 text-yellow-300 px-2 py-1 rounded">2026</span>
+        </div>
+
+        <!-- Selector de Puesto (Tabs superiores) -->
+        <div class="max-w-md mx-auto px-2 flex justify-around text-xs font-semibold border-t border-blue-400/40">
+            <button onclick="switchTab('promotor-senior')" id="tab-promotor-senior" class="tab-btn py-2.5 px-2 border-b-2 border-yellow-300 text-yellow-300 font-bold flex-1 text-center transition">
+                Promotor (+5m)
+            </button>
+            <button onclick="switchTab('promotor-junior')" id="tab-promotor-junior" class="tab-btn py-2.5 px-2 border-b-2 border-transparent text-blue-200 flex-1 text-center transition">
+                Curva (0-5m)
+            </button>
+            <button onclick="switchTab('supervisor')" id="tab-supervisor" class="tab-btn py-2.5 px-2 border-b-2 border-transparent text-blue-200 flex-1 text-center transition">
+                Supervisor
+            </button>
+            <button onclick="switchTab('tabulador')" id="tab-tabulador" class="tab-btn py-2.5 px-2 border-b-2 border-transparent text-blue-200 flex-1 text-center transition">
+                Tabulador
+            </button>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal -->
+    <main class="max-w-md mx-auto w-full px-4 pt-4 flex-1">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: PROMOTOR CONSOLIDADO (+5 MESES)     -->
+        <!-- ========================================== -->
+        <section id="sec-promotor-senior" class="space-y-4">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <h2 class="font-bold text-slate-800 text-sm uppercase tracking-wide">Promotor Mayor a 5 Meses</h2>
+                    <span class="text-[11px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">Piso: 4 colocaciones</span>
+                </div>
+
+                <!-- Entrada de Unidades Colocadas -->
+                <div class="mt-4">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Unidades Colocadas en el Mes</label>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="changeQty('senior-units', -1)" class="w-11 h-11 bg-slate-100 active:bg-slate-200 rounded-xl font-bold text-lg text-slate-700 flex items-center justify-center">-</button>
+                        <input type="number" id="senior-units" value="5" min="0" max="60" oninput="calcSenior()" class="w-full h-11 text-center font-black text-xl text-coppel-blue border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <button onclick="changeQty('senior-units', 1)" class="w-11 h-11 bg-slate-100 active:bg-slate-200 rounded-xl font-bold text-lg text-slate-700 flex items-center justify-center">+</button>
+                    </div>
+                </div>
+
+                <!-- Candado & Indicador de Escalón -->
+                <div id="senior-bracket-badge" class="mt-3 p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-xs text-blue-900 font-medium flex items-center justify-between">
+                    <span>Escalón actual:</span>
+                    <strong id="senior-bracket-text" class="text-coppel-blue font-bold text-sm">$1,800 c/u</strong>
+                </div>
+
+                <!-- Bono Coach -->
+                <div class="mt-4 pt-3 border-t border-slate-100">
+                    <label class="flex items-start space-x-2 cursor-pointer">
+                        <input type="checkbox" id="senior-coach" onchange="calcSenior()" class="w-4 h-4 mt-0.5 rounded text-blue-600 focus:ring-blue-500 border-slate-300">
+                        <div class="text-xs">
+                            <span class="font-bold text-slate-800">Bono Promotor Coach (+$4,000)</span>
+                            <p class="text-slate-500 text-[11px] leading-tight mt-0.5">Asesorado completó 4 meses y colocó 5 unidades en mes 5 y 6 (requiere que el coach coloque min. 5 unidades).</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Tarjeta de Resultados -->
+            <div class="bg-gradient-to-br from-blue-700 to-blue-900 rounded-2xl shadow-md p-5 text-white">
+                <span class="text-xs uppercase tracking-wider text-blue-200 font-semibold">Total a Percibir</span>
+                <div class="text-3xl font-black text-yellow-300 mt-1" id="senior-total">$9,000.00</div>
+
+                <div class="mt-4 pt-3 border-t border-blue-500/50 space-y-1.5 text-xs">
+                    <div class="flex justify-between text-blue-100">
+                        <span>Pago por Unidades:</span>
+                        <strong id="senior-subtotal-units" class="text-white">$9,000.00</strong>
+                    </div>
+                    <div class="flex justify-between text-blue-100">
+                        <span>Bono Coach:</span>
+                        <strong id="senior-coach-val" class="text-white">$0.00</strong>
+                    </div>
+                    <div class="flex justify-between text-blue-200 text-[11px] pt-1 border-t border-blue-600/40">
+                        <span>Utilidad aportada al negocio:</span>
+                        <span id="senior-business-value" class="font-bold text-yellow-300">$252,200</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: PROMOTOR NUEVO INGRESO (0 A 5 MESES) -->
+        <!-- ========================================== -->
+        <section id="sec-promotor-junior" class="space-y-4 hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <h2 class="font-bold text-slate-800 text-sm uppercase tracking-wide">Curva de Aprendizaje</h2>
+                    <span class="text-[11px] font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-full">Paga desde 1ª Colocación</span>
+                </div>
+
+                <!-- Selección de Mes -->
+                <div class="mt-3">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Mes de Antigüedad</label>
+                    <div class="grid grid-cols-6 gap-1 text-center font-bold text-xs" id="junior-month-selector">
+                        <button onclick="setJuniorMonth(0)" class="j-month-btn py-2 rounded-lg border bg-blue-50 border-blue-600 text-coppel-blue">M0</button>
+                        <button onclick="setJuniorMonth(1)" class="j-month-btn py-2 rounded-lg border bg-white border-slate-200 text-slate-700">M1</button>
+                        <button onclick="setJuniorMonth(2)" class="j-month-btn py-2 rounded-lg border bg-white border-slate-200 text-slate-700">M2</button>
+                        <button onclick="setJuniorMonth(3)" class="j-month-btn py-2 rounded-lg border bg-white border-slate-200 text-slate-700">M3</button>
+                        <button onclick="setJuniorMonth(4)" class="j-month-btn py-2 rounded-lg border bg-white border-slate-200 text-slate-700">M4</button>
+                        <button onclick="setJuniorMonth(5)" class="j-month-btn py-2 rounded-lg border bg-white border-slate-200 text-slate-700">M5</button>
+                    </div>
+                    <p id="junior-phase-desc" class="text-[11px] text-slate-500 mt-1 font-medium">Mes 0: Onboarding y Acreditación Normativa</p>
+                </div>
+
+                <!-- Campo Mes 0: Cumplimiento Capacitación -->
+                <div id="junior-m0-box" class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="junior-m0-cert" checked onchange="calcJunior()" class="w-4 h-4 text-blue-600 rounded">
+                        <span class="text-xs font-bold text-amber-900">Cumplió Itinerario, Cursos y Normativa ($1,500)</span>
+                    </label>
+                </div>
+
+                <!-- Campos de Ventas y Solicitudes (Meses 1 al 5) -->
+                <div id="junior-ops-box" class="mt-4 space-y-3 hidden">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Unidades Colocadas ($1,500 c/u)</label>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="changeQty('junior-sales', -1)" class="w-10 h-10 bg-slate-100 rounded-lg font-bold text-slate-700">-</button>
+                            <input type="number" id="junior-sales" value="2" min="0" oninput="calcJunior()" class="w-full h-10 text-center font-bold text-lg text-coppel-blue border rounded-lg">
+                            <button onclick="changeQty('junior-sales', 1)" class="w-10 h-10 bg-slate-100 rounded-lg font-bold text-slate-700">+</button>
+                        </div>
+                    </div>
+
+                    <div id="junior-reqs-wrapper">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1" id="junior-reqs-label">
+                            Solicitudes Completas Concretadas
+                        </label>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="changeQty('junior-requests', -1)" class="w-10 h-10 bg-slate-100 rounded-lg font-bold text-slate-700">-</button>
+                            <input type="number" id="junior-requests" value="3" min="0" oninput="calcJunior()" class="w-full h-10 text-center font-bold text-lg text-coppel-blue border rounded-lg">
+                            <button onclick="changeQty('junior-requests', 1)" class="w-10 h-10 bg-slate-100 rounded-lg font-bold text-slate-700">+</button>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1" id="junior-reqs-help">Mes 1: Se paga $1,500 cada 3 solicitudes.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resultado Curva -->
+            <div class="bg-gradient-to-br from-blue-700 to-blue-900 rounded-2xl shadow-md p-5 text-white">
+                <span class="text-xs uppercase tracking-wider text-blue-200 font-semibold">Total a Percibir (Curva)</span>
+                <div class="text-3xl font-black text-yellow-300 mt-1" id="junior-total">$1,500.00</div>
+
+                <div class="mt-4 pt-3 border-t border-blue-500/50 space-y-1.5 text-xs text-blue-100">
+                    <div class="flex justify-between">
+                        <span>Pago por Colocaciones:</span>
+                        <strong id="junior-sales-val" class="text-white">$0.00</strong>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Incentivo por Solicitudes / Cursos:</span>
+                        <strong id="junior-extra-val" class="text-white">$1,500.00</strong>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: SUPERVISOR DE CRÉDITO               -->
+        <!-- ========================================== -->
+        <section id="sec-supervisor" class="space-y-4 hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <h2 class="font-bold text-slate-800 text-sm uppercase tracking-wide">Supervisor Crédito Auto</h2>
+                    <span class="text-[11px] font-bold bg-blue-100 text-coppel-blue px-2 py-0.5 rounded-full">Candado 100% Expedientes</span>
+                </div>
+
+                <div class="mt-3">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Fase del Supervisor</label>
+                    <select id="sup-type" onchange="toggleSupFields()" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-700">
+                        <option value="consolidado">Consolidado (>3 meses) - Esquema Productividad</option>
+                        <option value="adaptacion">Adaptación (0 a 3 meses) - Garantizado 50%</option>
+                    </select>
+                </div>
+
+                <!-- Supervisor en Adaptación (0 a 3 meses) -->
+                <div id="sup-adapt-box" class="mt-4 space-y-3 hidden">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Sueldo Base Mensual ($)</label>
+                        <input type="number" id="sup-base-salary" value="18000" oninput="calcSupervisor()" class="w-full p-2.5 border rounded-xl font-bold text-slate-800">
+                    </div>
+                    <div class="space-y-2 pt-2">
+                        <label class="flex items-center space-x-2 text-xs">
+                            <input type="checkbox" id="sup-chk-itinerary" checked onchange="calcSupervisor()" class="w-4 h-4 text-blue-600 rounded">
+                            <span>Cumplimiento estricto de itinerario</span>
+                        </label>
+                        <label class="flex items-center space-x-2 text-xs">
+                            <input type="checkbox" id="sup-chk-training" checked onchange="calcSupervisor()" class="w-4 h-4 text-blue-600 rounded">
+                            <span>Acreditación de capacitaciones obligatorias</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Supervisor Consolidado (>3 meses) -->
+                <div id="sup-cons-box" class="mt-4 space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">% Equipo Comisionando (Meta: ≥80%)</label>
+                        <input type="range" id="sup-team-pct" min="0" max="100" value="80" oninput="updateSupSlider(this.value); calcSupervisor()" class="w-full accent-blue-600">
+                        <div class="flex justify-between text-xs font-bold text-slate-700">
+                            <span>0%</span>
+                            <span id="sup-team-pct-txt" class="text-coppel-blue text-sm">80%</span>
+                            <span>100%</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Unidades Colocadas por Equipo</label>
+                        <input type="number" id="sup-team-units" value="35" oninput="calcSupervisor()" class="w-full p-2.5 border rounded-xl font-bold text-slate-800 text-center">
+                    </div>
+
+                    <div class="p-3 bg-red-50 border border-red-200 rounded-xl">
+                        <label class="flex items-start space-x-2 cursor-pointer">
+                            <input type="checkbox" id="sup-candado" checked onchange="calcSupervisor()" class="w-4 h-4 mt-0.5 text-blue-600 rounded">
+                            <div class="text-xs">
+                                <span class="font-bold text-red-900">Entrega de 100% de Expedientes</span>
+                                <p class="text-red-700 text-[11px] leading-tight mt-0.5">Si falta un expediente, se retiene la comisión total.</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resultado Supervisor -->
+            <div class="bg-gradient-to-br from-blue-700 to-blue-900 rounded-2xl shadow-md p-5 text-white">
+                <span class="text-xs uppercase tracking-wider text-blue-200 font-semibold">Incentivo Supervisor</span>
+                <div class="text-3xl font-black text-yellow-300 mt-1" id="sup-total">$22,754.00</div>
+                <p id="sup-note" class="text-xs text-blue-200 mt-2">Cumple meta de retención y acompañamiento.</p>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: TABULADOR DE REFERENCIA             -->
+        <!-- ========================================== -->
+        <section id="sec-tabulador" class="space-y-4 hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+                <h3 class="font-bold text-sm text-slate-800 mb-2">Tabulador Promotores (+5 Meses)</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs text-left border-collapse">
+                        <thead>
+                            <tr class="bg-blue-50 text-coppel-blue">
+                                <th class="p-2 border">Unidades</th>
+                                <th class="p-2 border">Comisión c/u</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr><td class="p-2 border font-medium">0 a 3</td><td class="p-2 border text-red-500 font-bold">$0.00 (Sin pago)</td></tr>
+                            <tr class="bg-yellow-50"><td class="p-2 border font-bold">4</td><td class="p-2 border font-bold text-coppel-blue">$1,500.00</td></tr>
+                            <tr><td class="p-2 border font-medium">5 a 6</td><td class="p-2 border font-bold">$1,800.00</td></tr>
+                            <tr><td class="p-2 border font-medium">7 a 8</td><td class="p-2 border font-bold">$2,600.00</td></tr>
+                            <tr><td class="p-2 border font-medium">9 a 12</td><td class="p-2 border font-bold">$3,000.00</td></tr>
+                            <tr><td class="p-2 border font-medium">13 a 18</td><td class="p-2 border font-bold">$3,300.00</td></tr>
+                            <tr class="bg-green-50"><td class="p-2 border font-bold">19 o más</td><td class="p-2 border font-bold text-green-700">$3,600.00</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="font-bold text-sm text-slate-800 mt-4 mb-2">Curva de Aprendizaje (0 a 5 Meses)</h3>
+                <ul class="text-xs space-y-1.5 text-slate-600">
+                    <li>• <strong>Mes 0:</strong> $1,500 por acreditación de cursos y capacitaciones.</li>
+                    <li>• <strong>Mes 1:</strong> $1,500 por venta + $1,500 cada 3 solicitudes completas.</li>
+                    <li>• <strong>Mes 2:</strong> $1,500 por venta + $1,500 cada 7 solicitudes completas.</li>
+                    <li>• <strong>Mes 3:</strong> $1,500 por venta + $1,500 cada 10 solicitudes completas.</li>
+                    <li>• <strong>Mes 4 y 5:</strong> $1,500 por venta colocada (desde la 1ª unidad).</li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Barra de Estado / Guardar Cálculo -->
+    <footer class="max-w-md mx-auto w-full px-4 mt-3">
+        <button onclick="saveSimulation()" class="w-full py-3 bg-coppel-yellow active:bg-yellow-400 text-blue-950 font-bold text-xs rounded-xl shadow-sm flex items-center justify-center space-x-2">
+            <span>💾</span>
+            <span>Guardar Cálculo en mi Celular</span>
+        </button>
+        <p id="save-feedback" class="text-center text-[11px] text-green-700 font-semibold mt-1 hidden">Cálculo guardado exitosamente.</p>
+    </footer>
+
+    <!-- LÓGICA DE NEGOCIO Y CÁLCULOS JAVASCRIPT -->
+    <script>
+        const formatMoney = (val) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(val);
+
+        // Control de Tabs
+        function switchTab(tabId) {
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-yellow-300', 'text-yellow-300', 'font-bold');
+                btn.classList.add('border-transparent', 'text-blue-200');
+            });
+
+            document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            activeBtn.classList.remove('border-transparent', 'text-blue-200');
+            activeBtn.classList.add('border-yellow-300', 'text-yellow-300', 'font-bold');
+        }
+
+        function changeQty(inputId, delta) {
+            const el = document.getElementById(inputId);
+            let val = parseInt(el.value || 0) + delta;
+            if (val < 0) val = 0;
+            el.value = val;
+            el.dispatchEvent(new Event('input'));
+        }
+
+        // ==========================================
+        // CÁLCULO 1: PROMOTOR CONSOLIDADO (>5M)
+        // ==========================================
+        function calcSenior() {
+            const units = parseInt(document.getElementById('senior-units').value || 0);
+            const isCoach = document.getElementById('senior-coach').checked;
+
+            let rate = 0;
+            let bracketName = "";
+
+            if (units >= 19) {
+                rate = 3600;
+                bracketName = "$3,600 c/u (19 o más)";
+            } else if (units >= 13) {
+                rate = 3300;
+                bracketName = "$3,300 c/u (13 a 18)";
+            } else if (units >= 9) {
+                rate = 3000;
+                bracketName = "$3,000 c/u (9 a 12)";
+            } else if (units >= 7) {
+                rate = 2600;
+                bracketName = "$2,600 c/u (7 a 8)";
+            } else if (units >= 5) {
+                rate = 1800;
+                bracketName = "$1,800 c/u (5 a 6)";
+            } else if (units === 4) {
+                rate = 1500;
+                bracketName = "$1,500 c/u (4 unidades)";
+            } else {
+                rate = 0;
+                bracketName = "$0.00 (Mínimo 4 para comisionar)";
+            }
+
+            const unitsTotal = units * rate;
+            let coachBonus = 0;
+
+            // Bono coach solo aplica si el promotor coach coloca mínimo 5 créditos
+            if (isCoach) {
+                if (units >= 5) {
+                    coachBonus = 4000;
+                } else {
+                    coachBonus = 0;
+                }
+            }
+
+            const total = unitsTotal + coachBonus;
+            const businessUtility = units * 50440; // $50,440 utilidad por crédito de la presentación
+
+            // Render
+            document.getElementById('senior-bracket-text').innerText = bracketName;
+            document.getElementById('senior-subtotal-units').innerText = formatMoney(unitsTotal);
+            document.getElementById('senior-coach-val').innerText = isCoach && units < 5 ? "$0 (Requiere mín. 5 colocaciones)" : formatMoney(coachBonus);
+            document.getElementById('senior-total').innerText = formatMoney(total);
+            document.getElementById('senior-business-value').innerText = formatMoney(businessUtility);
+        }
+
+        // ==========================================
+        // CÁLCULO 2: PROMOTOR CURVA (0 A 5 MESES)
+        // ==========================================
+        let currentJuniorMonth = 0;
+
+        function setJuniorMonth(m) {
+            currentJuniorMonth = m;
+            const btns = document.querySelectorAll('.j-month-btn');
+            btns.forEach((btn, idx) => {
+                if (idx === m) {
+                    btn.classList.add('bg-blue-50', 'border-blue-600', 'text-coppel-blue');
+                    btn.classList.remove('bg-white', 'border-slate-200', 'text-slate-700');
+                } else {
+                    btn.classList.remove('bg-blue-50', 'border-blue-600', 'text-coppel-blue');
+                    btn.classList.add('bg-white', 'border-slate-200', 'text-slate-700');
+                }
+            });
+
+            const desc = document.getElementById('junior-phase-desc');
+            const m0Box = document.getElementById('junior-m0-box');
+            const opsBox = document.getElementById('junior-ops-box');
+            const reqsWrapper = document.getElementById('junior-reqs-wrapper');
+            const reqsHelp = document.getElementById('junior-reqs-help');
+
+            if (m === 0) {
+                desc.innerText = "Mes 0: Onboarding y Acreditación de Cursos";
+                m0Box.classList.remove('hidden');
+                opsBox.classList.add('hidden');
+            } else {
+                m0Box.classList.add('hidden');
+                opsBox.classList.remove('hidden');
+
+                if (m === 1) {
+                    desc.innerText = "Mes 1: Introducción (Solicitudes: $1,500 cada 3)";
+                    reqsWrapper.classList.remove('hidden');
+                    reqsHelp.innerText = "Mes 1: $1,500 por cada 3 solicitudes completas.";
+                } else if (m === 2) {
+                    desc.innerText = "Mes 2: Ejecución (Solicitudes: $1,500 cada 7)";
+                    reqsWrapper.classList.remove('hidden');
+                    reqsHelp.innerText = "Mes 2: $1,500 por cada 7 solicitudes completas.";
+                } else if (m === 3) {
+                    desc.innerText = "Mes 3: Ejecución (Solicitudes: $1,500 cada 10)";
+                    reqsWrapper.classList.remove('hidden');
+                    reqsHelp.innerText = "Mes 3: $1,500 por cada 10 solicitudes completas.";
+                } else {
+                    desc.innerText = `Mes ${m}: Afianzamiento (Solo colocaciones directas)`;
+                    reqsWrapper.classList.add('hidden');
+                }
+            }
+            calcJunior();
+        }
+
+        function calcJunior() {
+            let total = 0;
+            let salesVal = 0;
+            let extraVal = 0;
+
+            if (currentJuniorMonth === 0) {
+                const cert = document.getElementById('junior-m0-cert').checked;
+                extraVal = cert ? 1500 : 0;
+                total = extraVal;
+            } else {
+                const sales = parseInt(document.getElementById('junior-sales').value || 0);
+                salesVal = sales * 1500; // Paga desde la 1ª colocación $1,500
+
+                const reqs = parseInt(document.getElementById('junior-requests').value || 0);
+
+                if (currentJuniorMonth === 1) {
+                    extraVal = Math.floor(reqs / 3) * 1500;
+                } else if (currentJuniorMonth === 2) {
+                    extraVal = Math.floor(reqs / 7) * 1500;
+                } else if (currentJuniorMonth === 3) {
+                    extraVal = Math.floor(reqs / 10) * 1500;
+                } else {
+                    extraVal = 0;
+                }
+                total = salesVal + extraVal;
+            }
+
+            document.getElementById('junior-sales-val').innerText = formatMoney(salesVal);
+            document.getElementById('junior-extra-val').innerText = formatMoney(extraVal);
+            document.getElementById('junior-total').innerText = formatMoney(total);
+        }
+
+        // ==========================================
+        // CÁLCULO 3: SUPERVISOR
+        // ==========================================
+        function toggleSupFields() {
+            const type = document.getElementById('sup-type').value;
+            if (type === 'adaptacion') {
+                document.getElementById('sup-adapt-box').classList.remove('hidden');
+                document.getElementById('sup-cons-box').classList.add('hidden');
+            } else {
+                document.getElementById('sup-adapt-box').classList.add('hidden');
+                document.getElementById('sup-cons-box').classList.remove('hidden');
+            }
+            calcSupervisor();
+        }
+
+        function updateSupSlider(val) {
+            document.getElementById('sup-team-pct-txt').innerText = val + '%';
+        }
+
+        function calcSupervisor() {
+            const type = document.getElementById('sup-type').value;
+            let total = 0;
+            const note = document.getElementById('sup-note');
+
+            if (type === 'adaptacion') {
+                const base = parseFloat(document.getElementById('sup-base-salary').value || 0);
+                const itin = document.getElementById('sup-chk-itinerary').checked;
+                const train = document.getElementById('sup-chk-training').checked;
+
+                if (itin && train) {
+                    total = base * 0.50; // Bono mensual garantizado 50%
+                    note.innerText = "Bono garantizado del 50% por cumplimiento de itinerario y cursos.";
+                } else {
+                    total = 0;
+                    note.innerText = "Condición no acreditada (se requiere itinerario y cursos obligatorios).";
+                }
+            } else {
+                const candado100 = document.getElementById('sup-candado').checked;
+                if (!candado100) {
+                    total = 0;
+                    note.innerText = "Comisión retenida al 100% por falta de expedientes completos.";
+                } else {
+                    const teamPct = parseInt(document.getElementById('sup-team-pct').value || 0);
+                    const units = parseInt(document.getElementById('sup-team-units').value || 0);
+                    
+                    // Cálculo de referencia del esquema propuesto (~$22,754 meta base ajustada a cumplimiento)
+                    const factor = teamPct >= 80 ? 1.0 : (teamPct / 80);
+                    total = (units * 450 + 7000) * factor;
+                    note.innerText = teamPct >= 80 
+                        ? "Excelente: Cumple estándar de retención (≥80% comisionando)." 
+                        : "Por debajo de meta de comisionamiento de equipo (80%).";
+                }
+            }
+
+            document.getElementById('sup-total').innerText = formatMoney(total);
+        }
+
+        // Guardar en LocalStorage para no perder datos en el celular
+        function saveSimulation() {
+            const simulationData = {
+                date: new Date().toISOString(),
+                seniorUnits: document.getElementById('senior-units').value,
+                seniorTotal: document.getElementById('senior-total').innerText
+            };
+            localStorage.setItem('coppel_credito_auto_calc', JSON.stringify(simulationData));
+            const feedback = document.getElementById('save-feedback');
+            feedback.classList.remove('hidden');
+            setTimeout(() => feedback.classList.add('hidden'), 2500);
+        }
+
+        // Inicializar al cargar
+        window.onload = function() {
+            calcSenior();
+            calcJunior();
+            calcSupervisor();
+        };
+    </script>
+</body>
+</html>
